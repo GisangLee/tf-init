@@ -53,21 +53,6 @@ on:
         options:
           - prod
           - dev
-      websocket:
-        description: Websocket
-        type: boolean
-        default: false
-        required: false
-      celery:
-        description: Celery
-        type: boolean
-        default: false
-        required: false
-      celerybeat:
-        description: Celerybeat
-        type: boolean
-        default: false
-        required: false
 
 permissions:
   contents: read
