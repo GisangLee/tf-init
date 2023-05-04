@@ -68,11 +68,27 @@ jobs:
         name: Set Environment
         run: |
           echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g" | sed "s|-django||g")" >> $GITHUB_OUTPUT
-          
+
+  create-workspace:
+    name: 'create workspace'
+    needs: [ set_environment ]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Create Terraform Cloud Workspace
+      uses: hashicorp/setup-terraform@v1
+      with:
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      run: |
+        terraform login
+        terraform workspace new ${{ needs.set_environment.outputs.project_name }}-${{ needs.set_environment.outputs.project_env }}-middle-infra
+
   build_infra:
     name: 'build infra by terraform'
     runs-on: ubuntu-latest
-    needs: [ set_environment ]
+    needs: [ create_workspace ]
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -106,4 +122,4 @@ jobs:
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Apply
 #       run: terraform apply -auto-approve -var input_var=${{env.INPUT_VAR}} -var project_name=${{ needs.set_environment.outputs.project_name }} -input=false
-      run: terraform apply -auto-approve -var input_var=${{ needs.set_environment.outputs.project_env }} -var project_name=${{ needs.set_environment.outputs.project_name }} -input=false
+      run: terraform apply -auto-approve -var env=${{ needs.set_environment.outputs.project_env }} -var project_name=${{ needs.set_environment.outputs.project_name }} -input=false
