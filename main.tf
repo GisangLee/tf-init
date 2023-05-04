@@ -1,13 +1,3 @@
-variable "project_name" {
-  type    = string
-  default = "example"
-}
-
-variable "env" {
-  type    = string
-  default = "dev"
-}
-
 terraform {
   required_providers {
     aws = {
@@ -21,7 +11,7 @@ terraform {
     organization = "dude_tf_test"
 
     workspaces {
-      name = "${var.env}-${var.proejct_name}-middle-infra"
+      name = "${var.env}-${var.project_name}-middle-infra"
     }
   }
 }
