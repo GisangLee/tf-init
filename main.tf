@@ -15,11 +15,7 @@ terraform {
     organization = "dude_tf_test"
 
     workspaces {
-      prefix = var.project_name
-      tags = {
-        environment = var.env
-        project     = var.project_name
-      }
+        name = local.workspaces_name
     }
   }
 }
