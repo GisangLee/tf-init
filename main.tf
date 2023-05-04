@@ -1,3 +1,13 @@
+variable "project_name" {
+  type    = string
+  default = "example"
+}
+
+variable "env" {
+  type    = string
+  default = "dev"
+}
+
 terraform {
   required_providers {
     aws = {
@@ -23,3 +33,5 @@ provider "aws" {
   access_key = "AKIAVWTTQ7KNKDI5YLQ3"
   secret_key = "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"
 }
+
+
