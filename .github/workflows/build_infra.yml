@@ -67,8 +67,8 @@ jobs:
       - id: set_environment
         name: Set Environment
         run: |
-          echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g" | sed "s|-django||g")" >> $GITHUB_ENV
-          echo "env=${{ github.event.inputs.env }}" >> $GITHUB_ENV
+          echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g" | sed "s|-django||g")" >> $GITHUB_OUTPUT
+          echo "env=${{inputs.env}}" >> $GITHUB_OUTPUT
 
   build_infra:
     name: 'build infra by terraform'
