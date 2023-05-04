@@ -91,8 +91,8 @@ jobs:
 
     - name: Set Terraform environment variables
       run: |
-        echo "export TF_VAR_env=${{needs.set_environment.outputs.env}}"
-        echo "export TF_VAR_project_name=${{needs.set_environment.outputs.proejct_name}}"
+        echo "export TF_VAR_env=${{needs.set_environment.outputs.env}}" >> $GITHUB_ENV
+        echo "export TF_VAR_project_name=${{needs.set_environment.outputs.proejct_name}}" >> $GITHUB_ENV
 
     - name: Terraform Format
       id: fmt
@@ -100,9 +100,6 @@ jobs:
 
     - name: Terraform Init
       id: init
-      env:
-        env: ${{needs.set_environment.outputs.env}}
-        proejct_name: ${{needs.set_environment.outputs.proejct_name}}
       run: |
         terraform init
         echo "** Running Terraform Init**"
