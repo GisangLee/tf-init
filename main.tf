@@ -14,9 +14,16 @@ terraform {
     hostname     = "app.terraform.io"
     organization = "dude_tf_test"
 
-    workspaces {
-      name = local.workspace_name
-    }
+    # workspaces {
+    #   name = local.workspace_name
+    # }
+  }
+}
+
+# workspace name 설정
+default = {
+  workspaces = {
+    name = local.workspace_name
   }
 }
 
