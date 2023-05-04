@@ -20,7 +20,9 @@ terraform {
     organization = "dude_tf_test"
 
     workspaces {
-      name = "${var.env}-${var.project_name}-middle-infra"
+        tags = {
+            Name = "${var.env}-${var.project_name}-middle-infra"
+        }
     }
   }
 }

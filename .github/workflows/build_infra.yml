@@ -62,13 +62,13 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       project_name: ${{ steps.set_environment.outputs.project_name }}
-      project_env: ${{ steps.set_environment.outputs.project_env }}
+      env: ${{ steps.set_environment.outputs.env }}
     steps:
       - id: set_environment
         name: Set Environment
         run: |
           echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g" | sed "s|-django||g")" >> $GITHUB_ENV
-          echo "project_env=${{ github.event.inputs.env }}" >> $GITHUB_ENV
+          echo "env=${{ github.event.inputs.env }}" >> $GITHUB_ENV
 
   build_infra:
     name: 'build infra by terraform'
@@ -91,8 +91,8 @@ jobs:
 
     - name: Set Terraform environment variables
       run: |
-        echo "export TF_VAR_env=${{ inputs.env }}" >> $GITHUB_ENV
-        echo "export TF_VAR_project_name=${{ github.repository }}" >> $GITHUB_ENV
+        echo "export TF_VAR_env=${{needs.set_environment.outputs.env}}"
+        echo "export TF_VAR_project_name=${{needs.set_environment.outputs.proejct_name}}"
 
     - name: Terraform Format
       id: fmt
