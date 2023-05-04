@@ -47,7 +47,7 @@ on:
   workflow_dispatch:
     inputs:
       env:
-        description: Environment
+        description: 배포 환경
         type: choice
         required: true
         options:
@@ -67,7 +67,8 @@ jobs:
       - id: set_environment
         name: Set Environment
         run: |
-          echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g" | sed "s|-django||g")" >> $GITHUB_OUTPUT
+          echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g" | sed "s|-django||g")" >> $GITHUB_ENV
+          echo "project_env=${{ github.event.inputs.env }}" >> $GITHUB_ENV
 
   build_infra:
     name: 'build infra by terraform'
@@ -80,26 +81,28 @@ jobs:
         shell: bash
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v3
 
-    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Set Terraform environment variables
+      run: |
+        echo "export TF_VAR_env=${{ inputs.env }}" >> $GITHUB_ENV
+        echo "export TF_VAR_project_name=${{ github.repository }}" >> $GITHUB_ENV
+
     - name: Terraform Format
       id: fmt
       run: terraform fmt -check
 
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       id: init
-      with:
-        args: '-var="env=${{needs.set_environment.outputs.project_env}}" -var="poject_name=${{needs.set_environment.outputs.project_name}}"'
+      env:
+        env: ${{needs.set_environment.outputs.env}}
+        proejct_name: ${{needs.set_environment.outputs.proejct_name}}
       run: |
         terraform init
         echo "** Running Terraform Init**"
@@ -115,7 +118,6 @@ jobs:
         terraform workspace new ${{needs.set_environment.outputs.project_name}}-${{needs.set_environment.outputs.project_env}}-middle-infra
         terraform workspace select ${{needs.set_environment.outputs.project_name}}-${{needs.set_environment.outputs.project_env}}-middle-infra
 
-    # Generates an execution plan for Terraform
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false -var env=${{needs.set_environment.outputs.project_env}} -var project_name=${{needs.set_environment.outputs.project_name}}
