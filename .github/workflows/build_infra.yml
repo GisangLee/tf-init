@@ -90,21 +90,40 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    - name: Terraform Init
-      run: terraform init
-
-    - name: Create Workspace
-      run: |
-        terraform workspace new ${{needs.set_environment.outputs.project_name}}-${{needs.set_environment.outputs.project_env}}-middle-infra
-        terraform workspace select ${{needs.set_environment.outputs.project_name}}-${{needs.set_environment.outputs.project_env}}-middle-infra
-
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
+      id: fmt
       run: terraform fmt -check
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      id: init
+      run: |
+        terraform init
+        echo "** Running Terraform Init**"
+
+    - name: Terraform Validate
+      id: validate
+      run: |
+        terraform validate -no-color
+        echo "** Running Terraform Validate**"
+
+    # - name: Create Workspace
+    #   run: |
+    #     terraform workspace new ${{needs.set_environment.outputs.project_name}}-${{needs.set_environment.outputs.project_env}}-middle-infra
+    #     terraform workspace select ${{needs.set_environment.outputs.project_name}}-${{needs.set_environment.outputs.project_env}}-middle-infra
+
+    - name: Create WorkSpace
+      uses: sarathkrish/terraform-workspace@v1.2   
+      with:  
+        workSpaceName: ${{needs.set_environment.outputs.project_name}}-${{needs.set_environment.outputs.project_env}}-middle-infra
+        organizationName: "dude_tf_test"
+        terraformToken: ${{secrets.TF_API_TOKEN}}
+        terraformHost: 'app.terraform.io'
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
+      id: plan
       run: terraform plan -input=false -var env=${{needs.set_environment.outputs.project_env}} -var project_name=${{needs.set_environment.outputs.project_name}}
 
 #       # On push to "main", build or change infrastructure according to Terraform configuration files

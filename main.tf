@@ -1,5 +1,9 @@
-locals {
-  workspace_name = "${var.env}-${var.projectd_name}-middle-infra"
+variable "env" {
+  type = string
+}
+
+variable "project_name" {
+  type = string
 }
 
 terraform {
@@ -15,7 +19,7 @@ terraform {
     organization = "dude_tf_test"
 
     workspaces {
-        name = local.workspaces_name
+        name = "${var.env}-${var.project_name}-middle-infra"
     }
   }
 }
