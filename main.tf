@@ -1,12 +1,3 @@
-variable "env" {
-  type    = string
-  default = "dev"
-}
-
-variable "project_name" {
-  type = string
-}
-
 terraform {
   required_providers {
     aws = {
@@ -25,6 +16,16 @@ terraform {
         }
     }
   }
+}
+
+
+variable "env" {
+  type    = string
+  default = "dev"
+}
+
+variable "project_name" {
+  type = string
 }
 
 
