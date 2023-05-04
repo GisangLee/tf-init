@@ -11,7 +11,7 @@ terraform {
     organization = "dude_tf_test"
 
     workspaces {
-      name = var.env + var.proejct_name + "-middle" + "infra"
+      name = var.env + var.proejct_name + "-middle-" + "infra"
     }
   }
 }
