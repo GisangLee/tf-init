@@ -58,10 +58,20 @@ permissions:
   contents: read
 
 jobs:
+  set_environment:
+    runs-on: ubuntu-latest
+    outputs:
+      project_name: ${{ steps.set_environment.outputs.project_name }}
+    steps:
+      - id: set_environment
+        name: Set Environment
+        run: |
+          echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g" | sed "s|-django||g")" >> $GITHUB_OUTPUT
+          
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
-    environment: production
+    needs: [ set_environment ]
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -72,9 +82,6 @@ jobs:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v3
-      
-    - name: Get repository name
-      run: echo "::set-env name=REPO_NAME::$(basename $PWD)"
 
     - name: Get input variable
       run: echo "::set-env name=INPUT_VAR::${{ inputs.env }}"
@@ -100,4 +107,5 @@ jobs:
       # On push to "main", build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var input_var=${{env.INPUT_VAR}} -var project_name=${{env.REPO_NAME}} -input=false
+#       run: terraform apply -auto-approve -var input_var=${{env.INPUT_VAR}} -var project_name=${{ needs.set_environment.outputs.project_name }} -input=false
+      run: terraform apply -auto-approve -var input_var=${{env.INPUT_VAR}} -var project_name=${{ needs.set_environment.outputs.project_name }} -input=false
