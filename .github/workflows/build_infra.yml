@@ -98,6 +98,8 @@ jobs:
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       id: init
+      with:
+        args: '-var="env=${{needs.set_environment.outputs.project_env}}" -var="poject_name=${{needs.set_environment.outputs.project_name}}"'
       run: |
         terraform init
         echo "** Running Terraform Init**"
