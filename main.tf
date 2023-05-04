@@ -1,3 +1,7 @@
+locals {
+  workspace_name = "${var.env}-${var.projectd_name}-middle-infra"
+}
+
 terraform {
   required_providers {
     aws = {
@@ -11,17 +15,17 @@ terraform {
     organization = "dude_tf_test"
 
     workspaces {
-      name = "${var.env}-${var.project_name}-middle-infra"
+      name = local.workspace_name
     }
   }
 }
 
 
-# Configure the AWS Provider
-provider "aws" {
-  region     = "ap-northeast-2"
-  access_key = "AKIAVWTTQ7KNKDI5YLQ3"
-  secret_key = "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"
-}
+# # Configure the AWS Provider
+# provider "aws" {
+#   region     = "ap-northeast-2"
+#   access_key = "AKIAVWTTQ7KNKDI5YLQ3"
+#   secret_key = "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"
+# }
 
 
