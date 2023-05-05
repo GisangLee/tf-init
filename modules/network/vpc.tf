@@ -3,11 +3,11 @@ variable "AWS_REGION" {}
 
 // VPC
 resource "aws_vpc" "toktokhan-test-vpc" {
-  cidr_block       = "10.0.0.0/16"
+  cidr_block = "10.0.0.0/16"
 
   tags = {
-    IaC = "Terraform"
-    ENV = "${var.ENV}"
+    IaC  = "Terraform"
+    ENV  = "${var.ENV}"
     Name = "toktokhan-test-${var.ENV}-vpc"
   }
 }
@@ -18,8 +18,8 @@ resource "aws_internet_gateway" "toktokhan-test-igw" {
   vpc_id = aws_vpc.toktokhan-test-vpc.id
 
   tags = {
-    Iac = "Terraform"
-    ENV = var.ENV
+    Iac  = "Terraform"
+    ENV  = var.ENV
     Name = "toktokhan-test-${var.ENV}-igw"
   }
 }
@@ -32,8 +32,8 @@ resource "aws_eip" "toktokhan-test-ngw-eip" {
   depends_on = [aws_internet_gateway.toktokhan-test-igw]
 
   tags = {
-    Iac = "Terraform"
-    ENV = var.ENV
+    Iac  = "Terraform"
+    ENV  = var.ENV
     Name = "toktokhan-test-${var.ENV}-ngw-eip"
   }
 }
@@ -45,8 +45,8 @@ resource "aws_nat_gateway" "toktokhan-test-ngw" {
   subnet_id     = aws_subnet.toktokhan-test-public-subnet[0].id
   depends_on    = [aws_subnet.toktokhan-test-public-subnet[0]]
   tags = {
-    IaC = "Terraform"
-    ENV = var.ENV
+    IaC  = "Terraform"
+    ENV  = var.ENV
     Name = "toktokhan-test-${var.ENV}-ngw"
   }
 
@@ -62,8 +62,8 @@ resource "aws_route_table" "toktokhan-test-public-rt" {
   }
 
   tags = {
-    IaC = "Terraform"
-    ENV = var.ENV
+    IaC  = "Terraform"
+    ENV  = var.ENV
     Name = "toktokhan-test-${var.ENV}-public-rt"
   }
 }
@@ -77,8 +77,8 @@ resource "aws_route_table" "toktokhan-test-private-rt" {
   }
 
   tags = {
-    IaC = "Terraform"
-    ENV = var.ENV
+    IaC  = "Terraform"
+    ENV  = var.ENV
     Name = "toktokhan-test-${var.ENV}-private-rt"
   }
 }
@@ -86,14 +86,14 @@ resource "aws_route_table" "toktokhan-test-private-rt" {
 
 # Public Subnet
 resource "aws_subnet" "toktokhan-test-public-subnet" {
-  count = 2
-  vpc_id = aws_vpc.toktokhan-test-vpc.id
+  count             = 2
+  vpc_id            = aws_vpc.toktokhan-test-vpc.id
   availability_zone = "ap-northeast-2${count.index + 1 == 1 ? "a" : "b"}"
-  cidr_block = "10.0.${count.index + 1}.0/24"
+  cidr_block        = "10.0.${count.index + 1}.0/24"
 
   tags = {
-    Iac = "Terraform"
-    ENV = var.ENV
+    Iac  = "Terraform"
+    ENV  = var.ENV
     Name = "toktokhan-test-${var.ENV}-public-subnet"
   }
 }
@@ -106,8 +106,8 @@ resource "aws_subnet" "toktokhan-test-private-subnet" {
   cidr_block        = "10.0.${count.index + 3}.0/24"
 
   tags = {
-    Iac = "Terraform"
-    ENV = var.ENV
+    Iac  = "Terraform"
+    ENV  = var.ENV
     Name = "toktokhan-test-${var.ENV}-public-subnet"
   }
 }
@@ -118,7 +118,7 @@ resource "aws_route_table_association" "toktokhan-test-public-subnet-association
   subnet_id      = aws_subnet.toktokhan-test-public-subnet[count.index].id
   route_table_id = aws_route_table.toktokhan-test-public-rt.id
 
-  depends_on = [ aws_subnet.toktokhan-test-public-subnet ]
+  depends_on = [aws_subnet.toktokhan-test-public-subnet]
 }
 
 
@@ -128,5 +128,5 @@ resource "aws_route_table_association" "toktokhan-test-private-subnet-associatio
   subnet_id      = aws_subnet.toktokhan-test-private-subnet[count.index].id
   route_table_id = aws_route_table.toktokhan-test-private-rt.id
   depends_on     = [aws_subnet.toktokhan-test-private-subnet]
-  
+
 }

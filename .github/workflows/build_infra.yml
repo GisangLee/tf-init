@@ -93,6 +93,9 @@ jobs:
         echo "export TF_VAR_env=${{needs.set_environment.outputs.env}}" >> $GITHUB_ENV
         echo "export TF_VAR_project_name=${{needs.set_environment.outputs.proejct_name}}" >> $GITHUB_ENV
 
+    - name: Change directory based on environment
+      run: cd ${{ needs.set_environment.outputs.env }}
+
     - name: Terraform Format
       id: fmt
       run: terraform fmt -check
@@ -114,9 +117,9 @@ jobs:
       env:
         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-        TF_VAR_DB_USERNAME: "test"
-        TF_VAR_DB_PWD: "qwer1234"
-        TF_VAR_DB_NAME: "test"
+        TF_VAR_DB_USERNAME: "${{secrets.DB_USERNAME}}"
+        TF_VAR_DB_PWD: "${{secrets.DB_PWD}}"
+        TF_VAR_DB_NAME: "${{secrets.DB_NAME}}"
       run: terraform plan -out=plan
 
 #       # On push to "main", build or change infrastructure according to Terraform configuration files

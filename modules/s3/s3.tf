@@ -4,8 +4,8 @@ resource "aws_s3_bucket" "toktokhan-test-bucket" {
   bucket = "toktokhan-test-${var.ENV}-bucket"
 
   tags = {
-    Iac = "Terraform"
-    ENV = var.ENV
+    Iac  = "Terraform"
+    ENV  = var.ENV
     Name = "toktokhan-test-${var.ENV}-s3"
   }
 }
