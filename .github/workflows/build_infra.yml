@@ -74,6 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ set_environment ]
     env:
+      init-working-directory: ./init
       working-directory: ./${{inputs.env}}
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
@@ -85,30 +86,61 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Setup Terraform
+    - name: 테라폼 셋업
       uses: hashicorp/setup-terraform@v1
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    - name: 테라폼 파일 포맷팅
+    - name: 테라폼 상태관리 IaC 포맷팅
+      id: tfstate-fmt
+      working-directory: ${{ env.init-working-directory }}
+      run: terraform fmt -check
+
+    - name: 테라폼 상태관리 원격 저장소 
+      id: tfstate-init
+      working-directory: ${{ env.init-working-directory }}
+      run: |
+        terraform init
+        echo "** 테라폼 상태관리 원격 저장소 init ... **"
+
+    - name: Remote S3 tf state bucket 구성 확인
+      id: tfstate-plan
+      working-directory: ${{ env.init-working-directory }}
+      env:
+        TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
+        TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
+        TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
+      run: terraform plan
+
+    - name: 슬랙 알림
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        author_name: 인프라 원격 상태관리 환경 구성자 # default: 8398a7@action-slack
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+      if: always()
+
+    - name: 배포 환경 인프라 파일 포맷팅
       id: fmt
       run: terraform fmt -check
 
-    - name: 테라폼 init
+    - name: 배포 환경 인프라 init
       id: init
       working-directory: ${{ env.working-directory }}
       run: |
         terraform init
         echo "** Running Terraform Init**"
 
-    - name: 인프라 검증
+    - name: 배포 환경 인프라 검증
       id: validate
       working-directory: ${{ env.working-directory }}
       run: |
         terraform validate -no-color
         echo "** Running Terraform Validate**"
 
-    - name: 인프라 구성 확인
+    - name: 배포 환경 인프라 구성 확인
       id: plan
       working-directory: ${{ env.working-directory }}
       env:
@@ -124,7 +156,7 @@ jobs:
       uses: 8398a7/action-slack@v3
       with:
         status: ${{ job.status }}
-        author_name: 인프라 Builder # default: 8398a7@action-slack
+        author_name: 배포 환경 인프라 구성자 # default: 8398a7@action-slack
         fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required

@@ -4,3 +4,4 @@ dev/.terraform.lock.hcl
 prod/terraform.tfvars
 prod/.terraform
 prod/.terraform.lock.hcl
+init/terraform.tfvars
