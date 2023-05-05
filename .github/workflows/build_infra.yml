@@ -73,6 +73,8 @@ jobs:
     name: 'build infra by terraform'
     runs-on: ubuntu-latest
     needs: [ set_environment ]
+    env:
+      working-directory: ./${{inputs.dev}}
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -88,34 +90,27 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    - name: 배포 환경 설정
-      run: |
-        if [ ${{inputs.env}} == "dev" ]; then
-          echo "export TF_WORKING_DIR=./dev" >> $GITHUB_ENV
-        elif [ ${{inputs.env}} == "prod" ]; then
-          echo "export TF_WORKING_DIR=./prod" >> $GITHUB_ENV
-        fi
-        echo "export TF_VAR_env=${{inputs.env}}" >> $GITHUB_ENV
-        echo "export TF_VAR_project_name=${{needs.set_environment.outputs.proejct_name}}" >> $GITHUB_ENV
-
     - name: 테라폼 파일 포맷팅
       id: fmt
       run: terraform fmt -check
 
     - name: 테라폼 init
       id: init
+      working-directory: ${{ env.working-directory }}
       run: |
         terraform init
         echo "** Running Terraform Init**"
 
     - name: 테라폼 validate
       id: validate
+      working-directory: ${{ env.working-directory }}
       run: |
         terraform validate -no-color
         echo "** Running Terraform Validate**"
 
     - name: 테라폼 plan
       id: plan
+      working-directory: ${{ env.working-directory }}
       env:
         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
