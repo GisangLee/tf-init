@@ -117,6 +117,7 @@ jobs:
         TF_VAR_DB_USERNAME: "${{secrets.DB_USERNAME}}"
         TF_VAR_DB_PWD: "${{secrets.DB_PWD}}"
         TF_VAR_DB_NAME: "${{secrets.DB_NAME}}"
+        TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
       run: terraform plan
 
     - name: 슬랙 알림
