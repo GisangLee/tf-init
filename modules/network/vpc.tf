@@ -30,7 +30,7 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_eip" "ngw-eip" {
   vpc = true
 
-  depends_on = [aws_internet_gateway.toktokhan-test-igw]
+  depends_on = [aws_internet_gateway.igw]
 
   tags = {
     Iac  = "Terraform"
@@ -42,9 +42,9 @@ resource "aws_eip" "ngw-eip" {
 
 # NAT Gateway
 resource "aws_nat_gateway" "ngw" {
-  allocation_id = aws_eip.toktokhan-test-ngw-eip.id
-  subnet_id     = aws_subnet.toktokhan-test-public-subnet[0].id
-  depends_on    = [aws_subnet.toktokhan-test-public-subnet[0]]
+  allocation_id = aws_eip.ngw-eip.id
+  subnet_id     = aws_subnet.public-subnet[0].id
+  depends_on    = [aws_subnet.public-subnet[0]]
   tags = {
     IaC  = "Terraform"
     ENV  = var.ENV
