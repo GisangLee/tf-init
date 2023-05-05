@@ -88,9 +88,15 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    - name: 배포 환경 변경
-      id: cd
-      run: cd ${{inputs.env}}
+    - name: 배포 환경 설정
+      run: |
+        if [ ${{inputs.env}} == "dev" ]; then
+          echo "export TF_WORKING_DIR=./dev" >> $GITHUB_ENV
+        elif [ ${{inputs.env}} == "prod" ]; then
+          echo "export TF_WORKING_DIR=./prod" >> $GITHUB_ENV
+        fi
+        echo "export TF_VAR_env=${{inputs.env}}" >> $GITHUB_ENV
+        echo "export TF_VAR_project_name=${{needs.set_environment.outputs.proejct_name}}" >> $GITHUB_ENV
 
     - name: 테라폼 파일 포맷팅
       id: fmt
