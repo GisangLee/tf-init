@@ -119,6 +119,18 @@ jobs:
         TF_VAR_DB_NAME: "${{secrets.DB_NAME}}"
       run: terraform plan
 
+    - name: action-slack
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        author_name: 인프라 Builder # default: 8398a7@action-slack
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+      if: always()
+      
+      # Pick up events even if the job fails or is canceled.
+# Pick up events even if the job fails or is canceled.
 #       # On push to "main", build or change infrastructure according to Terraform configuration files
 #       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
 #     - name: Terraform Apply
