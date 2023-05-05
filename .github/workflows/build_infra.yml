@@ -68,7 +68,6 @@ jobs:
         name: Set Environment
         run: |
           echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g" | sed "s|-django||g")" >> $GITHUB_OUTPUT
-          echo "env=${{inputs.env}}" >> $GITHUB_OUTPUT
 
   build_infra:
     name: 'build infra by terraform'
@@ -110,14 +109,15 @@ jobs:
         terraform validate -no-color
         echo "** Running Terraform Validate**"
 
-    - name: Create Workspace
-      run: |
-        terraform workspace new ${{needs.set_environment.outputs.project_name}}-${{needs.set_environment.outputs.project_env}}-middle-infra
-        terraform workspace select ${{needs.set_environment.outputs.project_name}}-${{needs.set_environment.outputs.project_env}}-middle-infra
-
     - name: Terraform Plan
       id: plan
-      run: terraform plan -input=false -var env=${{needs.set_environment.outputs.project_env}} -var project_name=${{needs.set_environment.outputs.project_name}}
+      env:
+        TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
+        TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
+        TF_VAR_DB_USERNAME: "test"
+        TF_VAR_DB_PWD: "qwer1234"
+        TF_VAR_DB_NAME: "test"
+      run: terraform plan -out=plan
 
 #       # On push to "main", build or change infrastructure according to Terraform configuration files
 #       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
