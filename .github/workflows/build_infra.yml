@@ -101,14 +101,14 @@ jobs:
         terraform init
         echo "** Running Terraform Init**"
 
-    - name: 테라폼 validate
+    - name: 인프라 검증
       id: validate
       working-directory: ${{ env.working-directory }}
       run: |
         terraform validate -no-color
         echo "** Running Terraform Validate**"
 
-    - name: 테라폼 plan
+    - name: 인프라 구성 확인
       id: plan
       working-directory: ${{ env.working-directory }}
       env:

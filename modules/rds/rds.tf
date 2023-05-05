@@ -4,9 +4,10 @@ variable "DB_NAME" {}
 variable "DB_USERNAME" {}
 variable "DB_PWD" {}
 variable "SUBNET_IDS" {}
+variable "PROJECT_NAME" {}
 
-resource "aws_rds_cluster" "toktokhan-test-rds" {
-  cluster_identifier      = "toktokhan-test-${var.ENV}-rds-cluster"
+resource "aws_rds_cluster" "rds" {
+  cluster_identifier      = "${var.PROJECT_NAME}-${var.ENV}-rds-cluster"
   engine                  = "aurora-postgresql"
   availability_zones      = var.AZ_LIST
   database_name           = var.DB_NAME
@@ -23,13 +24,13 @@ resource "aws_rds_cluster" "toktokhan-test-rds" {
   }
 }
 
-resource "aws_db_subnet_group" "toktokhan-test-rds-subnet-group" {
-  name       = "toktokhan-test-${var.ENV}-rds-subnet-group"
+resource "aws_db_subnet_group" "rds-subnet-group" {
+  name       = "${var.PROJECT_NAME}-${var.ENV}-rds-subnet-group"
   subnet_ids = var.SUBNET_IDS
 
   tags = {
     Iac  = "Terraform"
     ENV  = var.ENV
-    Name = "toktokhan-test-${var.ENV}-rds-subnet-group"
+    Name = "${var.PROJECT_NAME}-${var.ENV}-rds-subnet-group"
   }
 }

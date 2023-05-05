@@ -10,4 +10,5 @@ variable "AWS_ACESST_KEY" {}
 variable "AWS_SECRET_ACCESS_KEY" {}
 variable "DB_NAME" {}
 variable "DB_USERNAME" {}
+variable "PROJECT_NAME" {}
 variable "DB_PWD" {}
