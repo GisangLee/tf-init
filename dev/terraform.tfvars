@@ -1,6 +1,0 @@
-
-AWS_ACESST_KEY =  ""
-AWS_SECRET_ACCESS_KEY = ""
-DB_USERNAME = ""
-DB_PWD = ""
-DB_NAME = ""
