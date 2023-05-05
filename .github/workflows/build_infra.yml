@@ -88,31 +88,27 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    - name: Set Terraform environment variables
-      run: |
-        echo "export TF_VAR_env=${{needs.set_environment.outputs.env}}" >> $GITHUB_ENV
-        echo "export TF_VAR_project_name=${{needs.set_environment.outputs.proejct_name}}" >> $GITHUB_ENV
+    - name: 배포 환경 변경
+      id: cd
+      run: cd ${{inputs.env}}
 
-    - name: Change directory based on environment
-      run: cd ${{ needs.set_environment.outputs.env }}
-
-    - name: Terraform Format
+    - name: 테라폼 파일 포맷팅
       id: fmt
       run: terraform fmt -check
 
-    - name: Terraform Init
+    - name: 테라폼 init
       id: init
       run: |
         terraform init
         echo "** Running Terraform Init**"
 
-    - name: Terraform Validate
+    - name: 테라폼 validate
       id: validate
       run: |
         terraform validate -no-color
         echo "** Running Terraform Validate**"
 
-    - name: Terraform Plan
+    - name: 테라폼 plan
       id: plan
       env:
         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
