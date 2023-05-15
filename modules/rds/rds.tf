@@ -1,7 +1,5 @@
 variable "ENV" {}
 variable "AZ_LIST" {}
-variable "DB_NAME" {}
-variable "DB_USERNAME" {}
 variable "DB_PWD" {}
 variable "SUBNET_IDS" {}
 variable "PROJECT_NAME" {}
@@ -10,8 +8,8 @@ resource "aws_rds_cluster" "rds" {
   cluster_identifier      = "${var.PROJECT_NAME}-${var.ENV}-rds-cluster"
   engine                  = "aurora-postgresql"
   availability_zones      = var.AZ_LIST
-  database_name           = var.DB_NAME
-  master_username         = var.DB_USERNAME
+  database_name           = var.PROJECT_NAME
+  master_username         = var.PROJECT_NAME
   master_password         = var.DB_PWD
   backup_retention_period = 5
   preferred_backup_window = "07:00-09:00"

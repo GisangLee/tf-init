@@ -68,73 +68,13 @@ jobs:
         name: Set Environment
         run: |
           echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g")" >> $GITHUB_OUTPUT
-
-  build_remote_backend:
-    name: '인프라 상태관리 환경 구성'
+  build_infra:
+    name: '배포 환경 인프라 구성'
     runs-on: ubuntu-latest
     needs: [ set_environment ]
     env:
       init-working-directory: ./init
       working-directory: ./${{inputs.env}}
-
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
-    defaults:
-      run:
-        shell: bash
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: 테라폼 셋업
-      uses: hashicorp/setup-terraform@v1
-      with:
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-    - name: 테라폼 상태관리 IaC 포맷팅
-      id: tfstate-fmt
-      working-directory: ${{ env.init-working-directory }}
-      run: terraform fmt -check
-
-    - name: 테라폼 상태관리 원격 저장소 
-      id: tfstate-init
-      working-directory: ${{ env.init-working-directory }}
-      run: |
-        terraform init
-        echo "** 테라폼 상태관리 원격 저장소 init ... **"
-
-    - name: Remote S3 tf state bucket 구성 확인
-      id: tfstate-plan
-      working-directory: ${{ env.init-working-directory }}
-      env:
-        TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
-        TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-        TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
-      run: terraform plan
-
-    - name: 원격 상태 관리 인프라 생성
-      id: apply
-      working-directory: ${{env.init-working-directory}}
-      env:
-        TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
-        TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-        TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
-      run: terraform apply -auto-approve -input=false
-
-    - name: 슬랙 알림
-      uses: 8398a7/action-slack@v3
-      with:
-        status: ${{ job.status }}
-        author_name: 인프라 원격 상태관리 환경 구성자 # default: 8398a7@action-slack
-        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-      if: always()
-
-  build_infra:
-    name: '배포 환경 인프라 구성'
-    runs-on: ubuntu-latest
-    needs: [ build_remote_backend ]
     steps:
     - name: 배포 환경 인프라 파일 포맷팅
       id: fmt
@@ -160,9 +100,6 @@ jobs:
       env:
         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-        TF_VAR_DB_USERNAME: "${{secrets.DB_USERNAME}}"
-        TF_VAR_DB_PWD: "${{secrets.DB_PWD}}"
-        TF_VAR_DB_NAME: "${{secrets.DB_NAME}}"
         TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
       run: terraform plan
     
@@ -172,9 +109,6 @@ jobs:
       env:
         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-        TF_VAR_DB_USERNAME: "${{secrets.DB_USERNAME}}"
-        TF_VAR_DB_PWD: "${{secrets.DB_PWD}}"
-        TF_VAR_DB_NAME: "${{secrets.DB_NAME}}"
         TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
       run: terraform apply -auto-approve -input=false
 
