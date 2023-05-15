@@ -33,3 +33,10 @@ module "rds" {
   SUBNET_IDS = module.vpc.subnet_list
   PROJECT_NAME = var.PROJECT_NAME
 }
+
+module "amplify-app" {
+  source = "../modules/amplify"
+  ENV = var.ENV
+  PROJECT_NAME = var.PROJECT_NAME
+  REPO_URL = var.REPO_URL
+}

@@ -101,6 +101,7 @@ jobs:
         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
         TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
+        TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
       run: terraform plan
     
     - name: 인프라 생성
@@ -110,6 +111,7 @@ jobs:
         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
         TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
+        TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
       run: terraform apply -auto-approve -input=false
 
     - name: 슬랙 알림
