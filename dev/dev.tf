@@ -5,6 +5,11 @@ module "vpc" {
     PROJECT_NAME = var.PROJECT_NAME
 }
 
+module "secret_manager" {
+  source = "../modules/secret_manager"
+  ENV = var.ENV
+  PROJECT_NAME = var.PROJECT_NAME
+}
 
 module "sg" {
     source = "../modules/sg"
@@ -23,16 +28,8 @@ module "s3" {
 module "rds" {
   source = "../modules/rds"
   ENV = var.ENV
-  AZ_LIST = module.toktokhan-dev-vpc.az_list
-  DB_USERNAME = var.DB_USERNAME
-  DB_NAME = var.DB_NAME
-  DB_PWD = var.DB_PWD
-  SUBNET_IDS = module.toktokhan-dev-vpc.subnet_list
+  AZ_LIST = module.vpc.az_list
+  DB_PWD = module.secret_manager.db-pwd
+  SUBNET_IDS = module.vpc.subnet_list
   PROJECT_NAME = var.PROJECT_NAME
-}
-
-module "dynamo" {
-  source = "../modules/dynamo"
-  PROJECT_NAME = var.PROJECT_NAME
-  ENV = var.ENV
 }
