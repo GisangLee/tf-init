@@ -27,7 +27,7 @@ jobs:
 
   build_vpc:
     name: VPC Provisioning
-    runs-on: ubuntu_latest
+    runs-on: ubuntu-latest
     needs: [set_environment]
     env:
       working-directory: ./${{inputs.env}}
