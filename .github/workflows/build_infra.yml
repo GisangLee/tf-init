@@ -193,22 +193,21 @@ jobs:
   build_ecs:
     runs-on: ubuntu_latest
     needs: [ build_vpc ]
-    env:
-      init-working-directory: ./init
-      working-directory: ./${{inputs.env}}
     steps:
       - name: 파일 포맷팅
+        working-directory: ./${{inputs.env}}
         id: fmt
         run: terraform fmt -check
 
       - name: ECS 생성 준비
         id: plan_ecs
+        working-directory: ./${{inputs.env}}
         env:
           TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
           TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
           TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan dir-ecs
+        run: terraform plan
 
       # - name: ECS 생성
       #   id: apply_ecs
