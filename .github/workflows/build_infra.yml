@@ -30,18 +30,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: [set_environment]
     env:
-      working-directory: ./${{inputs.env}}
+      working-directory: ./${{inputs.env}}/vpc
     steps:
       - uses: actions/checkout@v3
 
       - name: 파일 포맷팅
         id: fmt
-        working-directory: ./${{inputs.env}}/vpc
+        working-directory: ${{env.working-directory}}
         run: terraform fmt -check
 
       - name: VPC 준비 중
         id: plan_vpc
-        working-directory: ./${{inputs.env}}/vpc
+        working-directory: ${{env.working-directory}}
         env:
           TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
