@@ -74,7 +74,7 @@ jobs:
     needs: [set_environment]
     env:
       init-working-directory: ./init
-      working-directory: ./${{inputs.env}}/vpc
+      working-directory: ./${{inputs.env}}
     steps:
       - name: 파일 포맷팅
         id: fmt
@@ -87,7 +87,7 @@ jobs:
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
           TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
           TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan
+        run: terraform plan dir-vpc
 
       # - name: VPC 생성
       #   id: apply_vpc
@@ -104,7 +104,7 @@ jobs:
     needs: [ set_environment ]
     env:
       init-working-directory: ./init
-      working-directory: ./${{inputs.env}}/sg
+      working-directory: ./${{inputs.env}}
     steps:
       - name: 배포 환경 인프라 파일 포맷팅
         id: fmt
@@ -112,13 +112,12 @@ jobs:
 
       - name: 보안그룹 생성 준비
         id: plan_sg
-        working-directory: ${{ env.working-directory }}/sg
         env:
           TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
           TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
           TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan
+        run: terraform plan dir-sg
 
       # - name: 보안그룹 생성
       #   id: apply_sg
@@ -135,7 +134,7 @@ jobs:
     needs: [ set_environment ]
     env:
       init-working-directory: ./init
-      working-directory: ./${{inputs.env}}/sm
+      working-directory: ./${{inputs.env}}
     steps:
       - name: 파일 포맷팅
         id: fmt
@@ -149,7 +148,7 @@ jobs:
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
           TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
           TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan
+        run: terraform plan dir-sm
 
       # - name: Secret Manager 생성
       #   id: apply_sm
@@ -166,7 +165,7 @@ jobs:
     needs: [ set_environment ]
     env:
       init-working-directory: ./init
-      working-directory: ./${{inputs.env}}/s3
+      working-directory: ./${{inputs.env}}
     steps:
       - name: 파일 포맷팅
         id: fmt
@@ -179,7 +178,7 @@ jobs:
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
           TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
           TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan
+        run: terraform plan dir-s3
 
       # - name: S3 생성
       #   id: apply_s3
@@ -196,7 +195,7 @@ jobs:
     needs: [ build_vpc ]
     env:
       init-working-directory: ./init
-      working-directory: ./${{inputs.env}}/ecs
+      working-directory: ./${{inputs.env}}
     steps:
       - name: 파일 포맷팅
         id: fmt
@@ -209,7 +208,7 @@ jobs:
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
           TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
           TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan
+        run: terraform plan dir-ecs
 
       # - name: ECS 생성
       #   id: apply_ecs
