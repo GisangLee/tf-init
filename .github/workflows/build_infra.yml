@@ -132,7 +132,7 @@ jobs:
 
   build_sm:
     runs-on: ubuntu_latest
-    needs: [ build_sg ]
+    needs: [ set_environment ]
     env:
       init-working-directory: ./init
       working-directory: ./${{inputs.env}}/sm
@@ -193,7 +193,7 @@ jobs:
 
   build_ecs:
     runs-on: ubuntu_latest
-    needs: [ build_s3 ]
+    needs: [ build_vpc ]
     env:
       init-working-directory: ./init
       working-directory: ./${{inputs.env}}/ecs
