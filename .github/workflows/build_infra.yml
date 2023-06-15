@@ -30,14 +30,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: [set_environment]
     env:
-      working-directory: ./${{inputs.env}}/s3
+      working-directory: ./${{inputs.env}}/vpc
     steps:
       - uses: actions/checkout@v3
 
       - name: 파일 포맷팅
         id: fmt
         working-directory: ${{env.working-directory}}
-        run: terraform fmt -check
+        run: |
+          echo "project_name=$(echo "${{needs.set_environment.outputs.project_name}}")" | echo "working_directory=$(echo "${{env.working_directory}}")" | terraform fmt -check
 
       - name: VPC 준비 중
         id: plan_vpc
