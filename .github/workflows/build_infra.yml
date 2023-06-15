@@ -26,11 +26,18 @@ jobs:
           echo "project_name=$(echo "${{ github.repository }}" | sed "s|${{ github.repository_owner }}\/||g")" >> $GITHUB_OUTPUT
 
   build_vpc:
+    name: VPC Provisioning
     runs-on: ubuntu_latest
     needs: [set_environment]
     env:
       working-directory: ./${{inputs.env}}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
       - name: 파일 포맷팅
         id: fmt
         working-directory: ${{env.working-directory}}/vpc
