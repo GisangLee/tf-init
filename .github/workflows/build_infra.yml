@@ -32,11 +32,8 @@ jobs:
     env:
       working-directory: ./${{inputs.env}}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
 
       - name: 파일 포맷팅
         id: fmt
@@ -45,7 +42,7 @@ jobs:
 
       - name: VPC 준비 중
         id: plan_vpc
-        working-directory: ./${{inputs.env}}/vpc
+        working-directory: ./${{env.working-directory}}/vpc
         env:
           TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
