@@ -34,15 +34,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: 파일 init
-        working-directory: ${{env.working-directory}}
+      - name: VPC init
         run: terraform init
-
-      - name: 파일 포맷팅
         working-directory: ${{env.working-directory}}
-        run: terraform fmt -check
 
-      - name: VPC 준비 중
+      - name: 파일 포맷팅 
+        run: terraform fmt -check
+        working-directory: ${{env.working-directory}}
+
+      - name: Plan VPC
         working-directory: ${{env.working-directory}}
         env:
           TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
