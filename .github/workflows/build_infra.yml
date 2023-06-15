@@ -72,6 +72,9 @@ jobs:
   build_vpc:
     runs-on: ubuntu_latest
     needs: [set_environment]
+    env:
+      init-working-directory: ./init
+      working-directory: ./${{inputs.env}}/vpc
     steps:
       - name: 파일 포맷팅
         id: fmt
@@ -79,7 +82,6 @@ jobs:
 
       - name: VPC 준비 중
         id: plan_vpc
-        working-directory: ${{ env.working-directory }}/vpc
         env:
           TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
@@ -99,7 +101,10 @@ jobs:
 
   build_sg:
     runs-on: ubuntu_latest
-    needs: [ build_vpc ]
+    needs: [ set_environment ]
+    env:
+      init-working-directory: ./init
+      working-directory: ./${{inputs.env}}/sg
     steps:
       - name: 배포 환경 인프라 파일 포맷팅
         id: fmt
@@ -128,6 +133,9 @@ jobs:
   build_sm:
     runs-on: ubuntu_latest
     needs: [ build_sg ]
+    env:
+      init-working-directory: ./init
+      working-directory: ./${{inputs.env}}/sm
     steps:
       - name: 파일 포맷팅
         id: fmt
@@ -155,7 +163,10 @@ jobs:
 
   build_s3:
     runs-on: ubuntu_latest
-    needs: [ build_sm ]
+    needs: [ set_environment ]
+    env:
+      init-working-directory: ./init
+      working-directory: ./${{inputs.env}}/s3
     steps:
       - name: 파일 포맷팅
         id: fmt
@@ -163,7 +174,6 @@ jobs:
 
       - name: S3 생성 준비
         id: plan_s3
-        working-directory: ${{ env.working-directory }}/s3
         env:
           TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
@@ -184,6 +194,9 @@ jobs:
   build_ecs:
     runs-on: ubuntu_latest
     needs: [ build_s3 ]
+    env:
+      init-working-directory: ./init
+      working-directory: ./${{inputs.env}}/ecs
     steps:
       - name: 파일 포맷팅
         id: fmt
@@ -191,7 +204,6 @@ jobs:
 
       - name: ECS 생성 준비
         id: plan_ecs
-        working-directory: ${{ env.working-directory }}/ecs
         env:
           TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
