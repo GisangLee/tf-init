@@ -27,22 +27,22 @@ jobs:
 
   build_vpc:
     name: VPC Provisioning
-    runs-on: ubuntu-latest
+    runs-on: ubuntu_latest
     needs: [set_environment]
     env:
-      working-directory: ./${{inputs.env}}
+      working-directory: ../${{inputs.env}}
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v2
 
       - name: 파일 포맷팅
         id: fmt
-        working-directory: ${{env.working-directory}}/vpc
+        working-directory: ../${{inputs.env}}/vpc
         run: terraform fmt -check
 
       - name: VPC 준비 중
         id: plan_vpc
-        working-directory: ./${{env.working-directory}}/vpc
+        working-directory: ../${{inputs.env}}/vpc
         env:
           TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
           TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
