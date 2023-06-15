@@ -1,9 +1,68 @@
-      # - name: Secret Manager 생성
-      #   id: apply_sm
-      #   working-directory: ${{ env.working-directory }}/sm
-      #   env:
-      #     TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
-      #     TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-      #     TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
-      #     TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-      #   run: terraform apply -auto-approve -input=false
+# - name: Secret Manager 생성
+#   id: apply_sm
+#   working-directory: ${{ env.working-directory }}/sm
+#   env:
+#     TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
+#     TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
+#     TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
+#     TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+#   run: terraform apply -auto-approve -input=false
+
+
+# module "vpc" {
+#     source = "../modules/network"
+#     ENV = var.ENV
+#     AWS_REGION = var.AWS_REGION
+#     PROJECT_NAME = var.PROJECT_NAME
+# }
+
+# module "secret_manager" {
+#   source = "../modules/secret_manager"
+#   ENV = var.ENV
+#   PROJECT_NAME = var.PROJECT_NAME
+# }
+
+# module "sg" {
+#     source = "../modules/sg"
+#     ENV = var.ENV
+#     AWS_REGION = var.AWS_REGION
+#     VPC_ID = module.vpc.vpc_id
+#     PROJECT_NAME = var.PROJECT_NAME
+# }
+
+# module "s3" {
+#   source = "../modules/s3"
+#   ENV = var.ENV
+#   PROJECT_NAME = var.PROJECT_NAME
+# }
+
+# module "rds" {
+#   source = "../modules/rds"
+#   ENV = var.ENV
+#   AZ_LIST = module.vpc.az_list
+#   DB_PWD = module.secret_manager.db-pwd
+#   SUBNET_IDS = module.vpc.subnet_list
+#   PROJECT_NAME = var.PROJECT_NAME
+# }
+
+# module "amplify-app" {
+#   source = "../modules/amplify"
+#   ENV = var.ENV
+#   PROJECT_NAME = var.PROJECT_NAME
+#   REPO_URL = var.REPO_URL
+# }
+
+
+
+# variable "AWS_REGION" {
+#   default = "ap-northeast-2"
+# }
+
+# variable "ENV" {
+#   default = "dev"
+# }
+
+# variable "AWS_ACESST_KEY" {}
+# variable "AWS_SECRET_ACCESS_KEY" {}
+# variable "PROJECT_NAME" {}
+# variable "REPO_URL" {}

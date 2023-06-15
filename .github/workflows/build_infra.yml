@@ -28,10 +28,12 @@ jobs:
   build_vpc:
     runs-on: ubuntu_latest
     needs: [set_environment]
+    env:
+      working-directory: ./${{inputs.env}}
     steps:
       - name: 파일 포맷팅
         id: fmt
-        working-directory: ./${{inputs.env}}/vpc
+        working-directory: ${{env.working-directory}}/vpc
         run: terraform fmt -check
 
       - name: VPC 준비 중
@@ -44,98 +46,98 @@ jobs:
           TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
         run: terraform plan
 
-  build_sg:
-    runs-on: ubuntu_latest
-    needs: [ set_environment ]
-    steps:
-      - name: 배포 환경 인프라 파일 포맷팅
-        working-directory: ./${{inputs.env}}/sg
-        id: fmt
-        run: terraform fmt -check
+  # build_sg:
+  #   runs-on: ubuntu_latest
+  #   needs: [ set_environment ]
+  #   steps:
+  #     - name: 배포 환경 인프라 파일 포맷팅
+  #       working-directory: ./${{inputs.env}}/sg
+  #       id: fmt
+  #       run: terraform fmt -check
 
-      - name: 보안그룹 생성 준비
-        id: plan_sg
-        working-directory: ./${{inputs.env}}/sg
-        env:
-          TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
-          TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-          TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
-          TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan dir-sg
+  #     - name: 보안그룹 생성 준비
+  #       id: plan_sg
+  #       working-directory: ./${{inputs.env}}/sg
+  #       env:
+  #         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
+  #         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
+  #         TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
+  #         TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+  #       run: terraform plan dir-sg
 
-  build_sm:
-    runs-on: ubuntu_latest
-    needs: [ set_environment ]
-    steps:
-      - name: 파일 포맷팅
-        id: fmt
-        working-directory: ./${{inputs.env}}/sm
-        run: terraform fmt -check
+  # build_sm:
+  #   runs-on: ubuntu_latest
+  #   needs: [ set_environment ]
+  #   steps:
+  #     - name: 파일 포맷팅
+  #       id: fmt
+  #       working-directory: ./${{inputs.env}}/sm
+  #       run: terraform fmt -check
 
-      - name: Secret Manager 생성 준비
-        id: plan_sm
-        working-directory: ${{ env.working-directory }}/sm
-        env:
-          TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
-          TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-          TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
-          TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan dir-sm
+  #     - name: Secret Manager 생성 준비
+  #       id: plan_sm
+  #       working-directory: ${{ env.working-directory }}/sm
+  #       env:
+  #         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
+  #         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
+  #         TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
+  #         TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+  #       run: terraform plan dir-sm
 
-  build_s3:
-    runs-on: ubuntu_latest
-    needs: [ set_environment ]
-    env:
-      init-working-directory: ./init
-      working-directory: ./${{inputs.env}}
-    steps:
-      - name: 파일 포맷팅
-        id: fmt
-        run: terraform fmt -check
+  # build_s3:
+  #   runs-on: ubuntu_latest
+  #   needs: [ set_environment ]
+  #   env:
+  #     init-working-directory: ./init
+  #     working-directory: ./${{inputs.env}}
+  #   steps:
+  #     - name: 파일 포맷팅
+  #       id: fmt
+  #       run: terraform fmt -check
 
-      - name: S3 생성 준비
-        id: plan_s3
-        env:
-          TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
-          TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-          TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
-          TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan dir-s3
+  #     - name: S3 생성 준비
+  #       id: plan_s3
+  #       env:
+  #         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
+  #         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
+  #         TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
+  #         TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+  #       run: terraform plan dir-s3
 
-  build_ecs:
-    runs-on: ubuntu_latest
-    needs: [ build_vpc ]
-    steps:
-      - name: 파일 포맷팅
-        working-directory: ./${{inputs.env}}/ecs
-        id: fmt
-        run: terraform fmt -check
+  # build_ecs:
+  #   runs-on: ubuntu_latest
+  #   needs: [ build_vpc ]
+  #   steps:
+  #     - name: 파일 포맷팅
+  #       working-directory: ./${{inputs.env}}/ecs
+  #       id: fmt
+  #       run: terraform fmt -check
 
-      - name: ECS 생성 준비
-        id: plan_ecs
-        working-directory: ./${{inputs.env}}/ecs
-        env:
-          TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
-          TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
-          TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
-          TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-        run: terraform plan
+  #     - name: ECS 생성 준비
+  #       id: plan_ecs
+  #       working-directory: ./${{inputs.env}}/ecs
+  #       env:
+  #         TF_VAR_AWS_ACESST_KEY: "${{secrets.AWS_ACCESS_KEY}}"
+  #         TF_VAR_AWS_SECRET_ACCESS_KEY: "${{secrets.AWS_SECRET_ACCESS_KEY}}"
+  #         TF_VAR_PROJECT_NAME: ${{needs.set_environment.outputs.project_name}}
+  #         TF_VAR_REPO_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+  #       run: terraform plan
 
-  slack_noti:
-    name: '배포 환경 인프라 구성'
-    runs-on: ubuntu-latest
-    needs: [ build_ecs ]
-    env:
-      init-working-directory: ./init
-      working-directory: ./${{inputs.env}}
-    steps:
-    - name: 슬랙 알림
-      uses: 8398a7/action-slack@v3
-      with:
-        status: ${{ job.status }}
-        author_name: 배포 환경 인프라 구성자 # default: 8398a7@action-slack
-        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-      if: always()
+  # slack_noti:
+  #   name: '배포 환경 인프라 구성'
+  #   runs-on: ubuntu-latest
+  #   needs: [ build_ecs ]
+  #   env:
+  #     init-working-directory: ./init
+  #     working-directory: ./${{inputs.env}}
+  #   steps:
+  #   - name: 슬랙 알림
+  #     uses: 8398a7/action-slack@v3
+  #     with:
+  #       status: ${{ job.status }}
+  #       author_name: 배포 환경 인프라 구성자 # default: 8398a7@action-slack
+  #       fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+  #     env:
+  #       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+  #     if: always()
       
